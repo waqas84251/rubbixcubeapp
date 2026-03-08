@@ -253,7 +253,13 @@ class _CubeGameScreenState extends State<CubeGameScreen> with SingleTickerProvid
     });
 
     controller.onSolved = () {
-      if (mounted) _showWinModal();
+      if (mounted) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted && controller.isCubeSolved()) {
+            _showWinModal();
+          }
+        });
+      }
     };
 
     _uiTimer = Timer.periodic(const Duration(milliseconds: 50), (_) {
@@ -360,6 +366,9 @@ class _CubeGameScreenState extends State<CubeGameScreen> with SingleTickerProvid
 
   Future<void> _runShuffle() async {
     if (controller.isRotating || controller.isSequencePlaying) return;
+    
+    controller.resetCube(); // Ensure a completely fresh start!
+    await Future.delayed(const Duration(milliseconds: 50)); // Render reset state before animation begins
     
     var random = math.Random();
     List<v.Vector3> axes = [v.Vector3(1, 0, 0), v.Vector3(0, 1, 0), v.Vector3(0, 0, 1)];
